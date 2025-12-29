@@ -1,2 +1,3 @@
 # zone-core
-Core functions of JudahZone
+
+API/utilities of the [JudahZone](https://github.com/jeffmasty/JudahZone) project

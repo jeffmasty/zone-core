@@ -1,0 +1,11 @@
+package judahzone.api;
+
+public interface RecordAudio {
+
+	/** start or stop recording */
+	void capture(boolean onOrOff);
+
+	boolean isRecording();
+
+	void delete();
+}
