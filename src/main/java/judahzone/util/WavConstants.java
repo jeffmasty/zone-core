@@ -11,12 +11,13 @@ public interface WavConstants {
 	/** Samples in a process call */ //TODO upgrade latency to 256!
 	int JACK_BUFFER = 512;
 	int FFT_SIZE = 4096;
+	int TRANSFORM = FFT_SIZE * 2;
+	int AMPLITUDES = FFT_SIZE / 2;
+	int CHUNKS = FFT_SIZE / JACK_BUFFER;
 	float FPS = S_RATE / (float)JACK_BUFFER;
 
 	int DISK_BUFFER = 4096; //  read/write
 	/** 4 frames for frequency discernment */
-//	int FFT_BUFFER = 4096;
-//	int FFT_WINDOW = JACK_BUFFER;
 	int HALF_BUFFER = DISK_BUFFER / 2;
 	int FMT_CHUNK_ID = 0x20746D66;
 	int DATA_CHUNK_ID = 0x61746164;

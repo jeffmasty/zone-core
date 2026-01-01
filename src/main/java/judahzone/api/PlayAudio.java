@@ -12,8 +12,6 @@ public interface PlayAudio {
 
 	void setRecording(Recording r);
 
-	Recording getRecording();
-
 	void play(boolean onOrOff);
 
 	boolean isPlaying();
@@ -24,4 +22,5 @@ public interface PlayAudio {
 	float seconds();
 
 	void rewind();
+
 }

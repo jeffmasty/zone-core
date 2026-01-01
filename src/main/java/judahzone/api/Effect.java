@@ -1,6 +1,11 @@
 package judahzone.api;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import judahzone.util.Constants;
 
@@ -29,6 +34,26 @@ public interface Effect {
     void process(FloatBuffer left, FloatBuffer right);
 
     public interface RTEffect extends Effect { }
+
+    static final ConcurrentMap<Class<?>, java.util.List<String>> SETTINGS_CACHE =
+            new ConcurrentHashMap<>();
+
+    default List<String> getSettingNames() {
+        return SETTINGS_CACHE.computeIfAbsent(this.getClass(), cls -> {
+            for (Class<?> c : cls.getDeclaredClasses()) {
+                if (c.isEnum() && "Settings".equals(c.getSimpleName())) {
+                    Object[] consts = c.getEnumConstants();
+                    List<String> names = new ArrayList<>(consts.length);
+                    for (Object o : consts) names.add(o.toString());
+                    return Collections.unmodifiableList(names);
+                }
+            }
+            List<String> fallback = new ArrayList<>(getParamCount());
+            for (int i = 0; i < getParamCount(); i++) fallback.add("param" + i);
+            return Collections.unmodifiableList(fallback);
+        });
+    }
+
 
 }
 

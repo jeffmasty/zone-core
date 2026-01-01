@@ -22,6 +22,8 @@ judahzone/util/AudioTools.class
 judahzone/util/PitchTools.class
 judahzone/util/JsonUtil.class
 judahzone/api/Effect.class
+judahzone/util/MP3$1.class
+judahzone/util/MP3.class
 judahzone/api/Signature.class
 judahzone/api/AudioMode.class
 judahzone/api/Effect$RTEffect.class
@@ -31,6 +33,7 @@ judahzone/util/WavFile$1.class
 judahzone/api/Algo.class
 judahzone/util/RTLogger.class
 judahzone/util/WavFile$3.class
+judahzone/util/Services.class
 judahzone/util/RTLogger$LogEvent.class
 judahzone/api/Midi.class
 judahzone/api/Notification$Property.class

@@ -1,6 +1,7 @@
 package judahzone.util;
 
 import java.nio.FloatBuffer;
+import java.util.Arrays;
 import java.util.Vector;
 
 import javax.sound.sampled.AudioSystem;
@@ -10,41 +11,120 @@ import javax.sound.sampled.Mixer.Info;
 public class AudioTools  {
 
 	public static void silence(FloatBuffer a) {
+        if (a == null) return;
         a.rewind();
         int limit = a.limit();
+        if (a.hasArray()) {
+            float[] arr = a.array();
+            int base = a.arrayOffset();
+            for (int i = 0; i < limit; i++)
+                arr[base + i] = 0f;
+            // keep same semantics as put loop: move position to limit
+            a.position(limit);
+            return;
+        }
         for (int i = 0; i < limit; i++)
             a.put(0f);
 	}
 
+	// add to judahzone.util.AudioTools
+	public static void silence(float[] buf) {
+	    if (buf == null) return;
+	    Arrays.fill(buf, 0f);
+	}
+
+	public static void silence(float[][] stereo) {
+	    if (stereo == null) return;
+	    if (stereo.length > 0) Arrays.fill(stereo[0], 0f);
+	    if (stereo.length > 1) Arrays.fill(stereo[1], 0f);
+	}
+
 	/** MIX in and out */
 	public static void mix(FloatBuffer in, float gain, FloatBuffer out) {
+		if (in == null || out == null) return;
 		out.rewind();
 		in.rewind();
-	    int capacity = out.capacity();
-	    for (int i = 0; i < capacity; i++)
-	        out.put(i, out.get() + in.get() * gain);
+	    int n = Math.min(in.remaining(), out.remaining());
+	    if (in.hasArray() && out.hasArray()) {
+	        float[] ia = in.array();
+	        float[] oa = out.array();
+	        int io = in.arrayOffset() + in.position();
+	        int oo = out.arrayOffset() + out.position();
+	        for (int i = 0; i < n; i++)
+	            oa[oo + i] = oa[oo + i] + ia[io + i] * gain;
+	        // advance positions to n
+	        in.position(in.position() + n);
+	        out.position(out.position() + n);
+	        return;
+	    }
+	    for (int i = 0; i < n; i++) {
+	        float iv = in.get(i);
+	        float ov = out.get(i);
+	        out.put(i, ov + iv * gain);
+	    }
+	    // set positions like the original rewind/gets would have
+	    in.position(in.position() + n);
+	    out.position(out.position() + n);
 	}
 
 	/** MIX in and out */
 	public static void mix(FloatBuffer in, FloatBuffer out) {
+		if (in == null || out == null) return;
 		out.rewind();
 		in.rewind();
-	    int capacity = out.capacity();
-	    for (int i = 0; i < capacity; i++)
-	        out.put(i, out.get() + in.get());
+	    int n = Math.min(in.remaining(), out.remaining());
+	    if (in.hasArray() && out.hasArray()) {
+	        float[] ia = in.array();
+	        float[] oa = out.array();
+	        int io = in.arrayOffset() + in.position();
+	        int oo = out.arrayOffset() + out.position();
+	        for (int i = 0; i < n; i++)
+	            oa[oo + i] = oa[oo + i] + ia[io + i];
+	        in.position(in.position() + n);
+	        out.position(out.position() + n);
+	        return;
+	    }
+	    for (int i = 0; i < n; i++) {
+	        float iv = in.get(i);
+	        float ov = out.get(i);
+	        out.put(i, ov + iv);
+	    }
+	    in.position(in.position() + n);
+	    out.position(out.position() + n);
 	}
 
 	public static void mix(float[] in, float gain, FloatBuffer out) {
+		if (in == null || out == null) return;
 		out.rewind();
-		int capacity = out.capacity();
-		for (int i = 0; i < capacity; i++)
-			out.put(i, out.get() + in[i] * gain);
+		int n = Math.min(in.length, out.remaining());
+		if (out.hasArray()) {
+			float[] oa = out.array();
+			int oo = out.arrayOffset() + out.position();
+			for (int i = 0; i < n; i++)
+				oa[oo + i] = oa[oo + i] + in[i] * gain;
+			out.position(out.position() + n);
+			return;
+		}
+		for (int i = 0; i < n; i++)
+			out.put(i, out.get(i) + in[i] * gain);
+		out.position(out.position() + n);
 	}
 
 	public static void mix(FloatBuffer in, float[] out) {
+		if (in == null || out == null) return;
 		in.rewind();
-		for (int i = 0; i < out.length; i++)
-			out[i] += in.get();
+		int n = Math.min(in.remaining(), out.length);
+		if (in.hasArray()) {
+			float[] ia = in.array();
+			int io = in.arrayOffset() + in.position();
+			for (int i = 0; i < n; i++)
+				out[i] += ia[io + i];
+			in.position(in.position() + n);
+			return;
+		}
+		for (int i = 0; i < n; i++)
+			out[i] += in.get(i);
+		in.position(in.position() + n);
 	}
 
 	/** MIX
@@ -63,51 +143,110 @@ public class AudioTools  {
 
 	/** MIX */
 	public static void add(float factor, FloatBuffer in, float[] out) {
+		if (in == null || out == null) return;
 		in.rewind();
-		for (int i = 0; i < out.length; i++)
-			out[i] += in.get() * factor;
+		int n = Math.min(in.remaining(), out.length);
+		if (in.hasArray()) {
+			float[] ia = in.array();
+			int io = in.arrayOffset() + in.position();
+			for (int i = 0; i < n; i++)
+				out[i] += ia[io + i] * factor;
+			in.position(in.position() + n);
+			return;
+		}
+		for (int i = 0; i < n; i++)
+			out[i] += in.get(i) * factor;
+		in.position(in.position() + n);
 	}
 
 	public static void replace(float[] in, FloatBuffer out, float gain) {
+		if (in == null || out == null) return;
 		out.rewind();
-		for (int i = 0; i < in.length; i++)
-			out.put(in[i] * gain);
+		int n = Math.min(in.length, out.remaining());
+		if (out.hasArray()) {
+			float[] oa = out.array();
+			int oo = out.arrayOffset() + out.position();
+			for (int i = 0; i < n; i++)
+				oa[oo + i] = in[i] * gain;
+			out.position(out.position() + n);
+			return;
+		}
+		for (int i = 0; i < n; i++)
+			out.put(i, in[i] * gain);
+		out.position(out.position() + n);
 	}
 
 	public static void replace(float[] in, FloatBuffer out) {
+		if (in == null || out == null) return;
 		out.rewind();
-		for (int i = 0; i < out.capacity(); i++)
-			out.put(in[i]);
+		int n = Math.min(in.length, out.capacity());
+		if (out.hasArray()) {
+			float[] oa = out.array();
+			int oo = out.arrayOffset() + out.position();
+			for (int i = 0; i < n; i++)
+				oa[oo + i] = in[i];
+			out.position(out.position() + n);
+			return;
+		}
+		for (int i = 0; i < n; i++)
+			out.put(i, in[i]);
+		out.position(out.position() + n);
 	}
 
 	public static void gain(FloatBuffer buffer, float gain) {
+		if (buffer == null) return;
 		buffer.rewind();
-		for (int z = 0; z < buffer.capacity(); z++) {
-			buffer.put(buffer.get(z) * gain);
+		int n = buffer.capacity();
+		if (buffer.hasArray()) {
+			float[] a = buffer.array();
+			int base = buffer.arrayOffset();
+			for (int i = 0; i < n; i++) {
+				a[base + i] = a[base + i] * gain;
+			}
+			buffer.position(n);
+			return;
 		}
+		for (int z = 0; z < n; z++) {
+			buffer.put(z, buffer.get(z) * gain);
+		}
+		buffer.position(n);
 	}
 
 	public static void copy(FloatBuffer in, FloatBuffer out) {
+		if (in == null || out == null) return;
 		in.rewind();
 		out.rewind();
-		while(in.hasRemaining() && out.hasRemaining())
-			out.put(in.get());
+		int n = Math.min(in.remaining(), out.remaining());
+		if (in.hasArray() && out.hasArray()) {
+			System.arraycopy(in.array(), in.arrayOffset() + in.position(),
+					out.array(), out.arrayOffset() + out.position(), n);
+			in.position(in.position() + n);
+			out.position(out.position() + n);
+			return;
+		}
+		for (int i = 0; i < n; i++)
+			out.put(i, in.get(i));
+		in.position(in.position() + n);
+		out.position(out.position() + n);
 	}
 
 	public static void copy(FloatBuffer in, float[] out) {
+		if (in == null || out == null) return;
 		in.rewind();
-		int max = in.remaining();
-		if (out.length < max)
-			max = out.length;
-		for (int i = 0; i < max; i++)
-			out[i] = in.get();
+		int n = Math.min(in.remaining(), out.length);
+		if (in.hasArray()) {
+			System.arraycopy(in.array(), in.arrayOffset() + in.position(), out, 0, n);
+			in.position(in.position() + n);
+			return;
+		}
+		for (int i = 0; i < n; i++)
+			out[i] = in.get(i);
+		in.position(in.position() + n);
 	}
 
 	public static void copy(float[][] in, float[][] out) {
 		for (int i = 0; i < in.length; i++) {
-			for (int j = 0; j < out[i].length; j++) {
-				out[i][j] = in[i][j];
-			}
+			System.arraycopy(in[i], 0, out[i], 0, Math.min(in[i].length, out[i].length));
 		}
 	}
 
@@ -116,20 +255,6 @@ public class AudioTools  {
 		float[][] out = new float[in.length][in[0].length];
 		copy(in, out);
 		return out;
-	}
-
-	/** Calculates and returns the root mean square of the signal. Please
-	 * cache the result since it is calculated every time.
-	 * @param buffer The audio buffer to calculate the RMS for.
-	 * @return The <a href="http://en.wikipedia.org/wiki/Root_mean_square">RMS</a> of
-	 *         the signal present in the current buffer. */
-	public static float rms(float[] buffer) {
-		float result = 0f;
-		for (int i = 0; i < buffer.length; i++)
-			result += buffer[i] * buffer[i];
-
-		result = result / buffer.length;
-		return (float)Math.sqrt(result);
 	}
 
 	/** Source: be.tarsos.dsp.AudioEvent
@@ -205,25 +330,26 @@ public class AudioTools  {
 	    return phase;
 	}
 
-    /**Estimate an RMS-like amplitude from spectral magnitudes in an absolute bin range. */
-    public static double computeFrameRms(float[] amplitudes, int absStartBin, int absEndBin) {
-        absStartBin = Math.max(0, Math.min(amplitudes.length - 1, absStartBin));
-        absEndBin = Math.max(0, Math.min(amplitudes.length - 1, absEndBin));
-        if (absEndBin < absStartBin) return 0.0;
 
-        double sumPower = 0.0;
-        int count = 0;
-        for (int i = absStartBin; i <= absEndBin; i++) {
-            float mag = amplitudes[i];
-            if (!Float.isFinite(mag) || mag <= 0f) continue;
-            double p = mag * (double) mag;
-            sumPower += p;
-            count++;
-        }
-        if (count == 0) return 0.0;
-        double meanPower = sumPower / count;
-        return Math.sqrt(meanPower); // RMS-like amplitude
-    }
+	// Not used
+//    /**Estimate an RMS-like amplitude from spectral magnitudes in an absolute bin range. */
+//    public static double computeFrameRms(float[] amplitudes, int absStartBin, int absEndBin) {
+//        absStartBin = Math.max(0, Math.min(amplitudes.length - 1, absStartBin));
+//        absEndBin = Math.max(0, Math.min(amplitudes.length - 1, absEndBin));
+//        if (absEndBin < absStartBin) return 0.0;
+//
+//        double sumPower = 0.0;
+//        int count = 0;
+//        for (int i = absStartBin; i <= absEndBin; i++) {
+//            float mag = amplitudes[i];
+//            if (!Float.isFinite(mag) || mag <= 0f) continue;
+//            double p = mag * (double) mag;
+//            sumPower += p;
+//            count++;
+//        }
+//        if (count == 0) return 0.0;
+//        double meanPower = sumPower / count;
+//        return Math.sqrt(meanPower); // RMS-like amplitude
+//    }
 
 }
-

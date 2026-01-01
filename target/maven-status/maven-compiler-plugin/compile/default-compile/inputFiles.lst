@@ -23,12 +23,14 @@
 /home/judah/git/zone-core/src/main/java/judahzone/util/Folders.java
 /home/judah/git/zone-core/src/main/java/judahzone/util/FromDisk.java
 /home/judah/git/zone-core/src/main/java/judahzone/util/JsonUtil.java
+/home/judah/git/zone-core/src/main/java/judahzone/util/MP3.java
 /home/judah/git/zone-core/src/main/java/judahzone/util/Memory.java
 /home/judah/git/zone-core/src/main/java/judahzone/util/Pair.java
 /home/judah/git/zone-core/src/main/java/judahzone/util/PitchTools.java
 /home/judah/git/zone-core/src/main/java/judahzone/util/RTLogger.java
 /home/judah/git/zone-core/src/main/java/judahzone/util/Rainbow.java
 /home/judah/git/zone-core/src/main/java/judahzone/util/Recording.java
+/home/judah/git/zone-core/src/main/java/judahzone/util/Services.java
 /home/judah/git/zone-core/src/main/java/judahzone/util/SineWave.java
 /home/judah/git/zone-core/src/main/java/judahzone/util/Threads.java
 /home/judah/git/zone-core/src/main/java/judahzone/util/WavConstants.java
