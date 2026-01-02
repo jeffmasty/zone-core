@@ -1,6 +1,6 @@
 package judahzone.api;
 
-public interface TimeEffect extends Effect {
+public interface TimeFX extends FX {
 
 	static String[] TYPE = {"1/8", "1/4", "3/8", "1/2"};
 

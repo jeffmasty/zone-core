@@ -5,10 +5,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.Level; // Log4j2 Level
 
-import lombok.extern.log4j.Log4j;
-
+import lombok.extern.log4j.Log4j2;      // Lombok Log4j2
 /**
  * Headless logging service with a static API.
  *
@@ -19,7 +18,7 @@ import lombok.extern.log4j.Log4j;
  * This is a replacement for the previous LogService but exposes the original style
  * of static methods so you can call RTLogger.log(...), RTLogger.warn(...), etc.
  */
-@Log4j
+@Log4j2
 public final class RTLogger {
 
     public static interface Participant {
@@ -48,6 +47,7 @@ public final class RTLogger {
 
     // start dispatcher thread once
     static {
+    	// initLoging();
         Thread.startVirtualThread(() -> {
             try {
                 while (true) {
@@ -165,4 +165,39 @@ public final class RTLogger {
 
     // Prevent instantiation
     private RTLogger() { /* no-op */ }
+//    public static void initLogging() {
+//        ConfigurationBuilder<BuiltConfiguration> builder = ConfigurationBuilderFactory.newConfigurationBuilder();
+//        builder.setStatusLevel(Level.DEBUG);
+//        builder.setConfigurationName("ProgrammaticConfig");
+//
+//        // Layout
+//        ComponentBuilder<?> patternLayout = builder.newLayout("PatternLayout")
+//            .addAttribute("pattern", "%d{mm:ss} %-5p- %m%n");
+//
+//        // Console appender
+//        AppenderComponentBuilder console = builder.newAppender("console", "Console")
+//            .addAttribute("target", "SYSTEM_OUT")
+//            .add(patternLayout);
+//        builder.add(console);
+//
+//        // RollingFile appender (basic size policy example)
+//        AppenderComponentBuilder file = builder.newAppender("fileAppender", "RollingFile")
+//            .addAttribute("fileName", "Judah.log")
+//            .addAttribute("filePattern", "Judah-%i.log")
+//            .add(patternLayout);
+//        file.addComponent(builder.newComponent("Policies")
+//            .addComponent(builder.newComponent("SizeBasedTriggeringPolicy").addAttribute("size", "10MB")));
+//        builder.add(file);
+//
+//        // Specific loggers
+//        builder.add(builder.newLogger("be.tarsos.dsp.io.PipeDecoder", Level.ERROR).addAttribute("additivity", false));
+//        builder.add(builder.newLogger("org.jaudiolibs.jnajack", Level.ERROR).addAttribute("additivity", false));
+//
+//        // Root logger
+//        builder.add(builder.newRootLogger(Level.DEBUG)
+//            .add(builder.newAppenderRef("console"))
+//            .add(builder.newAppenderRef("fileAppender")));
+//
+//        Configurator.initialize(builder.build());
+//    }
 }

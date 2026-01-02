@@ -93,6 +93,18 @@ public class AudioTools  {
 	    out.position(out.position() + n);
 	}
 
+	public static void mix(float[] in, float[] sum) {
+	    for (int i = 0; i < sum.length; i++)
+	        sum[i] += in[i];
+	 }
+
+	public static void mix(float[] in, float gain, float[] out) {
+		if (in == null || out == null) return;
+		int n = Math.min(in.length, out.length);
+		for (int i = 0; i < n; i++)
+			out[i] = out[i] + in[i] * gain;
+	}
+
 	public static void mix(float[] in, float gain, FloatBuffer out) {
 		if (in == null || out == null) return;
 		out.rewind();
@@ -127,6 +139,7 @@ public class AudioTools  {
 		in.position(in.position() + n);
 	}
 
+
 	/** MIX
 	 * @param overdub
 	 * @param oldLoop*/
@@ -141,22 +154,29 @@ public class AudioTools  {
 		return oldLoop;
 	}
 
-	/** MIX */
-	public static void add(float factor, FloatBuffer in, float[] out) {
+//	/** MIX */
+//	public static void add(float factor, FloatBuffer in, float[] out) {
+//		if (in == null || out == null) return;
+//		in.rewind();
+//		int n = Math.min(in.remaining(), out.length);
+//		if (in.hasArray()) {
+//			float[] ia = in.array();
+//			int io = in.arrayOffset() + in.position();
+//			for (int i = 0; i < n; i++)
+//				out[i] += ia[io + i] * factor;
+//			in.position(in.position() + n);
+//			return;
+//		}
+//		for (int i = 0; i < n; i++)
+//			out[i] += in.get(i) * factor;
+//		in.position(in.position() + n);
+//	}
+
+	public static void replace(float [] in, float[] out, float gain) {
 		if (in == null || out == null) return;
-		in.rewind();
-		int n = Math.min(in.remaining(), out.length);
-		if (in.hasArray()) {
-			float[] ia = in.array();
-			int io = in.arrayOffset() + in.position();
-			for (int i = 0; i < n; i++)
-				out[i] += ia[io + i] * factor;
-			in.position(in.position() + n);
-			return;
-		}
+		int n = Math.min(in.length, out.length);
 		for (int i = 0; i < n; i++)
-			out[i] += in.get(i) * factor;
-		in.position(in.position() + n);
+			out[i] = in[i] * gain;
 	}
 
 	public static void replace(float[] in, FloatBuffer out, float gain) {
@@ -230,6 +250,19 @@ public class AudioTools  {
 		out.position(out.position() + n);
 	}
 
+	/**
+	 * Copy samples from a float[] into a FloatBuffer without changing the buffer's position.
+	 * Copies at most src.length samples or dst.remaining(), whichever is smaller.
+	 */
+	public static void copy(float[] src, java.nio.FloatBuffer dst) {
+	    if (src == null || dst == null) return;
+	    int len = Math.min(src.length, dst.remaining());
+	    int pos = dst.position();
+	    for (int i = 0; i < len; i++) {
+	        dst.put(pos + i, src[i]);
+	    }
+	}
+
 	public static void copy(FloatBuffer in, float[] out) {
 		if (in == null || out == null) return;
 		in.rewind();
@@ -243,6 +276,30 @@ public class AudioTools  {
 			out[i] = in.get(i);
 		in.position(in.position() + n);
 	}
+/*
+	public static void copy(float[] src, java.nio.FloatBuffer dst) {
+	    if (src == null || dst == null) return;
+	    int len = Math.min(src.length, dst.remaining());
+	    int pos = dst.position();
+	    for (int i = 0; i < len; i++) {
+	        dst.put(pos + i, src[i]);
+	    }
+	}
+
+	public static void copy(FloatBuffer in, float[] out) {
+		if (in == null || out == null) return;
+		in.rewind();
+		int n = Math.min(in.remaining(), out.length);
+		if (in.hasArray()) {
+			System.arraycopy(in.array(), in.arrayOffset() + in.position(), out, 0, n);
+			in.position(in.position() + n);
+			return;
+		}
+		for (int i = 0; i < n; i++)
+			out[i] = in.get(i);
+		in.position(in.position() + n);
+	}
+ */
 
 	public static void copy(float[][] in, float[][] out) {
 		for (int i = 0; i < in.length; i++) {
@@ -329,6 +386,8 @@ public class AudioTools  {
 	    }
 	    return phase;
 	}
+
+
 
 
 	// Not used

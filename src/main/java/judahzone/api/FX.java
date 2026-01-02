@@ -1,6 +1,5 @@
 package judahzone.api;
 
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,7 +8,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import judahzone.util.Constants;
 
-public interface Effect {
+public interface FX {
 
 	int SAMPLE_RATE = Constants.sampleRate();
 	int N_FRAMES = Constants.bufSize();
@@ -31,9 +30,9 @@ public interface Effect {
 
     /** do the work
      * @param right null for mono effect */
-    void process(FloatBuffer left, FloatBuffer right);
+    void process(float[] left, float[] right);
 
-    public interface RTEffect extends Effect { }
+    public interface RTFX extends FX { } // not an LFO
 
     static final ConcurrentMap<Class<?>, java.util.List<String>> SETTINGS_CACHE =
             new ConcurrentHashMap<>();
