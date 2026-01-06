@@ -32,7 +32,14 @@ public interface FX {
      * @param right null for mono effect */
     void process(float[] left, float[] right);
 
-    public interface RTFX extends FX { } // not an LFO
+    /** real-time FX (i.e., not LFO) */
+    public interface RTFX extends FX { }
+    /** analysis FX producing data of type T (Tuning, Transform, RMS) */
+    public interface Calc<T> extends RTFX {
+    	 /** Subclass hook executed on the analysis thread. Left and right copied arrays*/
+        T analyze(float[] left, float[] right);
+    }
+
 
     static final ConcurrentMap<Class<?>, java.util.List<String>> SETTINGS_CACHE =
             new ConcurrentHashMap<>();

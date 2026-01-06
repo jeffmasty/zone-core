@@ -1,4 +1,5 @@
 /home/judah/git/zone-core/src/main/java/judahzone/api/Algo.java
+/home/judah/git/zone-core/src/main/java/judahzone/api/Asset.java
 /home/judah/git/zone-core/src/main/java/judahzone/api/AudioMode.java
 /home/judah/git/zone-core/src/main/java/judahzone/api/Chord.java
 /home/judah/git/zone-core/src/main/java/judahzone/api/Controller.java
@@ -10,11 +11,13 @@
 /home/judah/git/zone-core/src/main/java/judahzone/api/Live.java
 /home/judah/git/zone-core/src/main/java/judahzone/api/Midi.java
 /home/judah/git/zone-core/src/main/java/judahzone/api/MidiClock.java
+/home/judah/git/zone-core/src/main/java/judahzone/api/MidiConstants.java
 /home/judah/git/zone-core/src/main/java/judahzone/api/Note.java
 /home/judah/git/zone-core/src/main/java/judahzone/api/Notification.java
 /home/judah/git/zone-core/src/main/java/judahzone/api/PlayAudio.java
 /home/judah/git/zone-core/src/main/java/judahzone/api/Played.java
 /home/judah/git/zone-core/src/main/java/judahzone/api/RecordAudio.java
+/home/judah/git/zone-core/src/main/java/judahzone/api/Registrar.java
 /home/judah/git/zone-core/src/main/java/judahzone/api/Signature.java
 /home/judah/git/zone-core/src/main/java/judahzone/api/TimeFX.java
 /home/judah/git/zone-core/src/main/java/judahzone/api/TimeListener.java

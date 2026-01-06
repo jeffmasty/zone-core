@@ -23,18 +23,21 @@ public class Recording extends Vector<float[][]> implements WavConstants {
 		}
 	}
 
-	/** Load an uncompressed WAV into memory with specified mastering. */
 	public static Recording loadInternal(File f, float mastering) throws IOException {
-		Recording result = new Recording();
-		if (f == null) return result;
+	    Recording result = new Recording();
+	    if (f == null)
+	        return result;
+	    new FromDisk().load(f, mastering, result);
 
-		new FromDisk().load(f, mastering, result);
-		return result;
+	    // Normalize the loaded recording to the requested mastering RMS (non-RT).
+	    if (!result.isEmpty() && mastering > 0f)
+	        AudioMetrics.normalizeToRms(result, mastering);
+
+	    return result;
 	}
-
 	/** Internal helper kept for legacy callers; no safety checks. */
 	public static Recording loadInternal(File f) throws IOException {
-		return loadInternal(f, 1f);
+		return loadInternal(f, WavConstants.RUN_LEVEL);
 	}
 
 	/**Create a new Recording containing at most {@code maxFrames} blocks (jack buffers).  By Reference, not copy. */

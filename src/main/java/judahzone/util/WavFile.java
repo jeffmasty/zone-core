@@ -255,11 +255,20 @@ public final class WavFile {
 
     // ------------------ WAV writing ------------------
 
+    public static final int BIT_DEPTH = 16;
+    /**
+     * Save Recording to WAV using defaults: Constants.sampleRate() and 16-bit PCM.
+     */
+    public static void save(Recording source, File destination, float denormalize) throws IOException {
+        save(source, destination, Constants.sampleRate(), BIT_DEPTH, denormalize);
+    }
+
+
     /**
      * Save Recording to WAV using defaults: Constants.sampleRate() and 16-bit PCM.
      */
     public static void save(Recording source, File destination) throws IOException {
-        save(source, destination, Constants.sampleRate(), 16);
+        save(source, destination, Constants.sampleRate(), BIT_DEPTH, WavConstants.TO_LINE);
     }
 
     /**
@@ -270,7 +279,7 @@ public final class WavFile {
      * This implementation streams the conversion from floats to PCM bytes so it
      * does not need to allocate one big byte[] for the entire file.
      */
-    public static void save(final Recording source, File destination, final int sampleRate, final int bitDepth) throws IOException {
+    public static void save(final Recording source, File destination, final int sampleRate, final int bitDepth, final float denormalize) throws IOException {
         if (source == null) throw new IllegalArgumentException("source is null");
         if (destination == null) throw new IllegalArgumentException("destination is null");
         if (sampleRate <= 0) throw new IllegalArgumentException("sampleRate must be > 0");

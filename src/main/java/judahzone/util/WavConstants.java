@@ -16,6 +16,12 @@ public interface WavConstants {
 	int CHUNKS = FFT_SIZE / JACK_BUFFER;
 	float FPS = S_RATE / (float)JACK_BUFFER;
 
+	/** desired internal headroom off LINE-LEVEL = 1 */
+	float RUN_LEVEL = 0.25f;
+	float FILE_LEVEL = RUN_LEVEL * 0.5f;
+	float TO_LINE = 1 / RUN_LEVEL;
+	float LIVE_FACTOR = TO_LINE * 2;
+
 	int DISK_BUFFER = 4096; //  read/write
 	/** 4 frames for frequency discernment */
 	int HALF_BUFFER = DISK_BUFFER / 2;

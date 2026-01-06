@@ -1,6 +1,5 @@
+// PlayAudio.java
 package judahzone.api;
-
-import judahzone.util.Recording;
 
 /**Participates in real time audio processing, can respond to some commands*/
 public interface PlayAudio {
@@ -10,7 +9,7 @@ public interface PlayAudio {
 		/** play on repeat */ LOOP
 		}
 
-	void setRecording(Recording r);
+	void setRecording(Asset a);
 
 	void play(boolean onOrOff);
 
@@ -23,4 +22,18 @@ public interface PlayAudio {
 
 	void rewind();
 
+	void setEnv(float env);
+
+	void setType(Type type);
+
+	/** move playback to the closest frame for the given sample number  */
+	void setSample(long sampleFrame);
+
+//	/** compatibility / standardized name used across scope package */
+//	default void setPlaySampleFrame(long sampleFrame) {
+//		// default implementation delegates to setSample for backward/forward compatibility
+//		setSample(sampleFrame);
+//	}
+
+	void setPlayed(Played p);
 }

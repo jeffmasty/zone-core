@@ -6,7 +6,7 @@ import java.io.IOException;
 
 /**	------------WavFile------------<br/>
  * load uncompressed Stereo Audio data of .wav File (Loop or a (Drum)Sample) organized by Jack buffer. <br/>
- * No memory or safety checks are performed here, unless using canLoadSafely().
+ * No resampling is performed. No memory/safety checks are performed here, unless using canLoadSafely().
  * <br/>
  * <br/><pre>
 	Wav file IO class
@@ -208,107 +208,15 @@ public class FromDisk implements WavConstants {
 	}
 
 	/** Hard cap for one in‑memory Recording, in bytes. */
-	private static final long MAX_RECORDING_BYTES = 256L * 1024L * 1024L; // 256 MB
+	static final long MAX_RECORDING_BYTES = 256L * 1024L * 1024L; // 256 MB
 
-	/**
-	 * Estimate bytes needed for a full in‑memory Recording only
-	 * (no FFTs / analysis). Used by Loop, Sample Library, etc.
-	 */
-	public static boolean canLoadRecording(File f) {
-		if (f == null || !f.isFile()) return false;
+	static final double COMPRESSED_BYTES_FACTOR = 8.0;
 
-		long fileBytes = f.length();
-		if (fileBytes <= 0) return false;
-
-		try {
-			String name = f.getName().toLowerCase();
-			boolean compressed = name.endsWith(".mp3")
-					|| name.endsWith(".flac")
-					|| name.endsWith(".ogg")
-					|| name.endsWith(".m4a");
-
-			int sampleRate = S_RATE;
-			int channels = 2;
-			int bytesPerSample = 2; // 16-bit
-
-			long bytesPerSecondPcm = (long) sampleRate * channels * bytesPerSample;
-			if (bytesPerSecondPcm <= 0) return true;
-
-			// Compressed formats: assume ~8:1 compression → more seconds per byte.
-			double effectiveBytes = compressed ? fileBytes * 8.0 : fileBytes;
-
-			double seconds = effectiveBytes / bytesPerSecondPcm;
-			double fps = FPS; // JACK frames per second
-			long frames = (long) Math.ceil(seconds * fps);
-			if (frames <= 0) return true;
-
-			// Recording memory: 2 channels * JACK_BUFFER * 4 bytes (float)
-			long bytesPerFrame = 2L * JACK_BUFFER * Float.BYTES;
-			long recordingBytes = frames * bytesPerFrame;
-
-			long maxHeap = Runtime.getRuntime().maxMemory();
-			long softCap = maxHeap / 3;                 // at most 1/3 heap
-			long limit = Math.min(softCap, MAX_RECORDING_BYTES);
-
-			return recordingBytes < limit;
-
-		} catch (Throwable t) {
-			RTLogger.warn(FromDisk.class, t);
-			return true;
-		}
+	static boolean isCompressedFormat(String name) {
+	    return name.endsWith(".mp3")
+	            || name.endsWith(".flac")
+	            || name.endsWith(".ogg")
+	            || name.endsWith(".m4a");
 	}
 
-	/**
-	 * Estimate bytes needed for a Recording plus JudahScope-style FFT analysis
-	 * (Transform[] with amplitudes). Use this for Scope to leave room for FFTs.
-	 */
-	public static boolean canLoadForScope(File f) {
-		if (f == null || !f.isFile()) return false;
-
-		long fileBytes = f.length();
-		if (fileBytes <= 0) return false;
-
-		try {
-			String name = f.getName().toLowerCase();
-			boolean compressed = name.endsWith(".mp3")
-					|| name.endsWith(".flac")
-					|| name.endsWith(".ogg")
-					|| name.endsWith(".m4a");
-
-			int sampleRate = S_RATE;
-			int channels = 2;
-			int bytesPerSample = 2; // 16-bit
-
-			long bytesPerSecondPcm = (long) sampleRate * channels * bytesPerSample;
-			if (bytesPerSecondPcm <= 0) return true;
-
-			double effectiveBytes = compressed ? fileBytes * 8.0 : fileBytes;
-			double seconds = effectiveBytes / bytesPerSecondPcm;
-			double fps = FPS;
-			long frames = (long) Math.ceil(seconds * fps);
-			if (frames <= 0) return true;
-
-			// Recording memory
-			long bytesPerFrame = 2L * JACK_BUFFER * Float.BYTES;
-			long recordingBytes = frames * bytesPerFrame;
-
-			// FFT / Transform memory (Scope)
-			int chunksPerFft = FFT_SIZE / JACK_BUFFER;        // CHUNKS
-			long fftFrames = Math.max(1, frames / Math.max(1, chunksPerFft));
-			long amplitudesPerFrame = FFT_SIZE / 2;           // AMPLITUDES
-			long fftBytes = fftFrames * amplitudesPerFrame * Float.BYTES;
-
-			long estimatedBytes = recordingBytes + fftBytes;
-
-			long maxHeap = Runtime.getRuntime().maxMemory();
-			long softCap = maxHeap / 3;                       // at most 1/3 heap
-			long limit = Math.min(softCap, MAX_RECORDING_BYTES);
-
-			return estimatedBytes < limit;
-
-		} catch (Throwable t) {
-			RTLogger.warn(FromDisk.class, t);
-			return true;
-		}
-	}
 }

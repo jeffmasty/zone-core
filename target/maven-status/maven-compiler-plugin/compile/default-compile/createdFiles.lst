@@ -2,6 +2,7 @@ judahzone/api/Notification.class
 judahzone/util/WavFile.class
 judahzone/util/FromDisk.class
 judahzone/util/Folders.class
+judahzone/api/FX$Calc.class
 judahzone/api/Key.class
 judahzone/api/IRProvider.class
 judahzone/api/Tuning.class
@@ -24,8 +25,10 @@ judahzone/util/Recording.class
 judahzone/util/AudioMetrics$RMS.class
 judahzone/util/SineWave.class
 judahzone/util/RTLogger.class
+judahzone/api/Asset$Category.class
 judahzone/util/WavFile$3.class
 judahzone/util/Services.class
+judahzone/api/Registrar.class
 judahzone/api/TimeListener.class
 judahzone/util/AudioMetrics.class
 judahzone/api/Controller.class
@@ -43,6 +46,7 @@ judahzone/api/Note.class
 judahzone/util/PitchTools.class
 judahzone/util/MP3$1.class
 judahzone/api/Signature.class
+judahzone/api/Asset.class
 judahzone/util/WavFile$1.class
 judahzone/api/Algo.class
 judahzone/api/Transform.class
@@ -53,5 +57,6 @@ judahzone/api/Live.class
 judahzone/util/Threads.class
 judahzone/util/RTLogger$Participant.class
 judahzone/api/PlayAudio$Type.class
+judahzone/api/MidiConstants.class
 judahzone/util/Rainbow.class
 judahzone/api/RecordAudio.class

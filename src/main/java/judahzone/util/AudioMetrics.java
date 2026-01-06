@@ -19,7 +19,6 @@ import java.util.Objects;
  */
 public final class AudioMetrics {
 
-	public static final float LIVE_FACTOR = 20; // TODO live audio ~8x weaker than recorded audio?
 	public static final int Y_FACTOR = 550; // boost RMS into pixel range
 	public static final int INTENSITY = 200; // scale peaks into pixels
 	public static final int I_SHIFT = 37; // shift intensity off blue
@@ -27,6 +26,85 @@ public final class AudioMetrics {
     private AudioMetrics() {}
 
     /**
+	 * Scale both left/right by the same gain so stereo balance is preserved.
+	 * Allocation-free and uses AudioMetrics helpers.
+	 * @param targetRms target linear RMS (0 to disable)
+	 */
+	public static void normalizeToRms(float[] l, float[] r, float targetRms, float maxGain) {
+	    if (targetRms <= 0f) return;            // disabled
+	    float rl = rms(l);
+	    float rr = rms(r);
+	    float cur = Math.max(rl, rr);
+	    if (cur <= 0f) return;                  // silent, nothing to do
+	    float gain = targetRms / cur;
+	    if (maxGain > 0f && gain > maxGain) gain = maxGain;
+	    if (Math.abs(gain - 1f) < 1e-6f) return; // no-op
+	    scale(l, gain);
+	    scale(r, gain);
+	}
+
+	public static void normalizeToRms(Recording rec, float targetRms) {
+	    if (rec == null || rec.isEmpty() || targetRms <= 0f) return;
+
+	    double sumSq = 0.0;
+	    long count = 0L;
+	    float maxAbs = 0f;
+
+	    // Measure RMS and peak
+	    for (int i = 0; i < rec.size(); i++) {
+	        float[][] block = rec.get(i);
+	        if (block == null) continue;
+	        for (int ch = 0; ch < block.length; ch++) {
+	            float[] buf = block[ch];
+	            if (buf == null) continue;
+	            for (float v : buf) {
+	                if (!Float.isFinite(v)) continue;
+	                sumSq += (double) v * (double) v;
+	                count++;
+	                float abs = Math.abs(v);
+	                if (abs > maxAbs) maxAbs = abs;
+	            }
+	        }
+	    }
+
+	    if (count == 0L) return;
+
+	    double curRms = Math.sqrt(sumSq / count);
+	    if (curRms <= 0.0) return;
+
+	    double gain = targetRms / curRms;
+
+	    // Cap gain to avoid clipping (keep peak <= 1.0)
+	    if (maxAbs > 0f) {
+	        double maxGainBeforeClip = 1.0 / maxAbs;
+	        if (gain > maxGainBeforeClip) gain = maxGainBeforeClip;
+	    }
+
+	    // No-op if gain is effectively 1
+	    if (Math.abs(gain - 1.0) < 1e-9) return;
+
+	    float fgain = (float) gain;
+
+	    // Apply scaling in-place
+	    for (int i = 0; i < rec.size(); i++) {
+	        float[][] block = rec.get(i);
+	        if (block == null) continue;
+	        for (int ch = 0; ch < block.length; ch++) {
+	            float[] buf = block[ch];
+	            if (buf == null) continue;
+	            for (int j = 0; j < buf.length; j++) {
+	                buf[j] *= fgain;
+	            }
+	        }
+	    }
+	}
+
+	/** Convert dB to linear RMS (20 * log10 RMS). */
+	public static float dbToLinearRms(float db) {
+	    return (float) Math.pow(10.0, db / 20.0);
+	}
+
+	/**
      * Simple bundle of channel metrics.
      *
      * @param rms RMS value (linear amplitude; 0..1 typical)

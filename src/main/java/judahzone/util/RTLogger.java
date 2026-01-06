@@ -150,9 +150,11 @@ public final class RTLogger {
     }
 
     public static void debug(Class<?> caller, String msg) {
-        debug((Object) caller, msg);
+        if (level == Level.DEBUG || level == Level.TRACE) {
+            // delegate to log(Class, String) so the caller name becomes the actual class simple name
+            log(caller, "debug " + msg);
+        }
     }
-
     // ======== Internal helper ========
 
     private static void offer(LogEvent ev) {

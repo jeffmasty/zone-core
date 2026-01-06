@@ -32,7 +32,7 @@ public final class MP3 {
 
     /** Convenience: default mastering = 1.0f */
     public static Recording load(File f) {
-        return load(f, 1f);
+        return load(f, WavConstants.RUN_LEVEL);
     }
 
     /** Convenience: fill and return a new Recording by decoding the file. */

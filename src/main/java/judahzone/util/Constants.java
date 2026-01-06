@@ -9,7 +9,10 @@ public class Constants {
 	// TODO generalize
 	public static int sampleRate() { return WavConstants.S_RATE; }
 	public static int bufSize() { return WavConstants.JACK_BUFFER; }
+	public static int fftSize() { return WavConstants.FFT_SIZE; }
+	public static int amplitudeSize() { return WavConstants.AMPLITUDES; }
 	public static float fps() { return WavConstants.FPS; }
+
 	/** Digital Interface name */
 	@Getter static String di = "Komplete ";// "UMC1820 MIDI 1";
 	public static final String LEFT_OUT = "system:playback_1";
