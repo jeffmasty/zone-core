@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -22,6 +23,11 @@ public class JsonUtil {
 
 	public static <T> T readJson(File file, Class<T> clazz) throws IOException {
 		return MAPPER.readValue(file, clazz);
+	}
+
+	/** Read JSON using a TypeReference (useful for List\<T\>, Map\<\>, etc.) */
+	public static <T> T readJson(File file, TypeReference<T> typeRef) throws IOException {
+		return MAPPER.readValue(file, typeRef);
 	}
 
 	public static void saveString(String json, File toFile) throws IOException {

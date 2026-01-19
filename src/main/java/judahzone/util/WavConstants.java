@@ -18,7 +18,7 @@ public interface WavConstants {
 
 	/** desired internal headroom off LINE-LEVEL = 1 */
 	float RUN_LEVEL = 0.25f;
-	float FILE_LEVEL = RUN_LEVEL * 0.5f;
+	float FILE_LEVEL = RUN_LEVEL * 0.25f;
 	float TO_LINE = 1 / RUN_LEVEL;
 	float LIVE_FACTOR = TO_LINE * 2;
 

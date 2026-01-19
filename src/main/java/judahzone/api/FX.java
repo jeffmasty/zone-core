@@ -39,7 +39,10 @@ public interface FX {
     	 /** Subclass hook executed on the analysis thread. Left and right copied arrays*/
         T analyze(float[] left, float[] right);
     }
-
+    public interface Registrar {
+    	void register(Calc<?> analyzer);
+    	void unregister(Calc<?> analyzer);
+    }
 
     static final ConcurrentMap<Class<?>, java.util.List<String>> SETTINGS_CACHE =
             new ConcurrentHashMap<>();

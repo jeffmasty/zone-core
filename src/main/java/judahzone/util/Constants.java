@@ -6,6 +6,8 @@ import lombok.Getter;
 
 public class Constants {
 
+	public static final String APP_NAME = "JudahZone";
+
 	// TODO generalize
 	public static int sampleRate() { return WavConstants.S_RATE; }
 	public static int bufSize() { return WavConstants.JACK_BUFFER; }
@@ -94,6 +96,7 @@ public class Constants {
     /** see https://stackoverflow.com/a/846249 */
 	private static final int minp = 1;
 	private static final int maxp = 100;
+
 	public static float logarithmic(int percent, float min, float max) {
 
 		// percent will be between 0 and 100
