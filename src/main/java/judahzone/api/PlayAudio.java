@@ -29,11 +29,5 @@ public interface PlayAudio {
 	/** move playback to the closest frame for the given sample number  */
 	void setSample(long sampleFrame);
 
-//	/** compatibility / standardized name used across scope package */
-//	default void setPlaySampleFrame(long sampleFrame) {
-//		// default implementation delegates to setSample for backward/forward compatibility
-//		setSample(sampleFrame);
-//	}
-
 	void setPlayed(Played p);
 }

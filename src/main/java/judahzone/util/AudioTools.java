@@ -254,7 +254,7 @@ public class AudioTools  {
 	 * Copy samples from a float[] into a FloatBuffer without changing the buffer's position.
 	 * Copies at most src.length samples or dst.remaining(), whichever is smaller.
 	 */
-	public static void copy(float[] src, java.nio.FloatBuffer dst) {
+	public static void copy(float[] src, FloatBuffer dst) {
 	    if (src == null || dst == null) return;
 	    int len = Math.min(src.length, dst.remaining());
 	    int pos = dst.position();
@@ -285,21 +285,13 @@ public class AudioTools  {
 	        dst.put(pos + i, src[i]);
 	    }
 	}
+*/
 
-	public static void copy(FloatBuffer in, float[] out) {
+	public static void copy(float[] in, float[] out) {
 		if (in == null || out == null) return;
-		in.rewind();
-		int n = Math.min(in.remaining(), out.length);
-		if (in.hasArray()) {
-			System.arraycopy(in.array(), in.arrayOffset() + in.position(), out, 0, n);
-			in.position(in.position() + n);
-			return;
-		}
-		for (int i = 0; i < n; i++)
-			out[i] = in.get(i);
-		in.position(in.position() + n);
+		int n = Math.min(in.length, out.length);
+		System.arraycopy(in, 0, out, 0, n);
 	}
- */
 
 	public static void copy(float[][] in, float[][] out) {
 		for (int i = 0; i < in.length; i++) {
