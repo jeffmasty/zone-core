@@ -8,6 +8,7 @@ import be.tarsos.dsp.AudioDispatcher;
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
+import judahzone.data.Recording;
 
 /**
  * Small helper that encapsulates the TarsosDSP AudioDispatcher-based file decoding logic

@@ -1,4 +1,4 @@
-package judahzone.util;
+package judahzone.data;
 
 public record Pair(String key, Object value) {
 

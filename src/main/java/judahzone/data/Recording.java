@@ -1,10 +1,15 @@
-package judahzone.util;
+package judahzone.data;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
 
 import javax.sound.sampled.AudioFormat;
+
+import judahzone.util.AudioMetrics;
+import judahzone.util.AudioTools;
+import judahzone.util.FromDisk;
+import judahzone.util.WavConstants;
 
 /**Uncompressed Stereo Audio (.wav File, Loop, Sample) organized by Jack buffer.*/
 public class Recording extends Vector<float[][]> implements WavConstants {

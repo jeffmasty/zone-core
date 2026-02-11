@@ -1,4 +1,4 @@
-package judahzone.api;
+package judahzone.data;
 
 import judahzone.util.AudioMetrics;
 

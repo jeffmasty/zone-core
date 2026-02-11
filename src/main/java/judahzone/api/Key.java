@@ -4,18 +4,10 @@ import javax.sound.midi.ShortMessage;
 
 public enum Key {
 
-    C  (0, 0, null),
-    Db (0, 5, "C#"),
-    D  (2, 0, null),
-    Eb (0, 3, "D#"),
-    E  (4, 0, null),
-    F  (0, 1, null),
-    Gb (6, 6, "F#"),
-    G  (1, 0, null),
-    Ab (0, 4, "G#"),
-    A  (3, 0, null),
-    Bb (0, 2, "A#"),
-    B  (0, 5, null);
+	C(0, 0, null), Db(0, 5, "C#"), D(2, 0, null),
+	Eb(0, 3, "D#"), E(4, 0, null), F(0, 1, null),
+	Gb(6, 6, "F#"),	G(1, 0, null), Ab(0, 4, "G#"),
+	A(3, 0, null), Bb(0, 2, "A#"), B(0, 5, null);
 
 	public static final String FLAT = "\u266D";
 	public static final String SHARP = "\u266F";
@@ -23,33 +15,46 @@ public enum Key {
 	public static final float TUNING = 440;
 
 	private Key(int sharps, int flats, String alt) {
-		this.sharps = sharps; this.flats = flats; this.alt = alt;
+		this.sharps = sharps;
+		this.flats = flats;
+		this.alt = alt;
 	}
+
 	private final int sharps;
-    private final int flats;
-    final String alt;
+	private final int flats;
+	final String alt;
 
-    public int getSharps() { return sharps; }
-    public int getFlats() { return flats; }
-    public String getAlt() { return alt; }
+	public int getSharps() {
+		return sharps;
+	}
 
-    public static boolean isPlain(int data1) {
-    	return Key.values()[data1 % 12].alt == null;
-    }
+	public int getFlats() {
+		return flats;
+	}
 
-    public static Key lookup(String txt) {
-    	for (Key k : values())
-    		if (k.name().equals(txt) || txt.equals(k.alt))
-    			return k;
-    	return C; // fail
-    }
+	public String getAlt() {
+		return alt;
+	}
 
-    public static Key key(int data1) {
-    	return Key.values()[data1 % OCTAVE];
-    }
+	public static boolean isPlain(int data1) {
+		return Key.values()[Math.floorMod(data1, OCTAVE)].alt == null;
+	}
 
-    public static Key key(ShortMessage m) {
-    	return key(m.getData1());
+	public static Key lookup(String txt) {
+		for (Key k : values())
+			if (k.name().equals(txt) || txt.equals(k.alt))
+				return k;
+		return C; // fail
+	}
+
+	public static Key key(int data1) {
+		// Accept any integer (may be negative) and wrap into 0..11 safely.
+		int idx = Math.floorMod(data1, OCTAVE);
+		return Key.values()[idx];
+	}
+
+	public static Key key(ShortMessage m) {
+		return key(m.getData1());
 	}
 
     public String alt() { return alt; }

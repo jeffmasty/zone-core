@@ -29,6 +29,8 @@ public class Folders { // TODO Folder/Settings Service not hardcoded
 	@Getter static final File SheetMusic = new File(LIVE, "sheets");
 	@Getter static final File SynthPresets = new File(LIVE, "taco.sauce");
 	@Getter static final File UserChannels = new File(LIVE, "channel.zone");
+	@Getter static final File DrumSynth = new File(LIVE, "drumsynth.zone");
+	@Getter static final File Oldschool = new File(LIVE, "oldschool.zone");
 	// @Getter static final File Bass = new File(LIVE, "bass"); // monosynth
 
 	@Getter static final File ImportDrums = new File(HOME, "/tracks/beatbuddy/");

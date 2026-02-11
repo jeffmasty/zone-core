@@ -2,14 +2,33 @@ package judahzone.api;
 
 import java.util.List;
 
+import judahzone.util.RTLogger;
+import lombok.Getter;
+
 /**Engine-agnostic port API for async creation/query/connect of ports.
 Providers (engine-specific) implement the Provider interface and use Request/Query/Connect records to schedule work.
 Callbacks are invoked when an operation completes; reply is implementation-specific (e.g. port object or list of port names). */
-public abstract class Ports {
+public abstract class AudioEngine {
 
+	static final String JACK_HELPER = "Jack";
+	static final String JAVAX_HELPER = "Javax";
+
+	/** Audio Engine */
+	public enum Engine { JACK, JAVAX } // PortAudio
 	public enum Type { AUDIO, MIDI }
-
 	public enum IO { IN, OUT }
+
+	/** Audio Engine */
+	@Getter private static Engine engine = Engine.JAVAX;
+	public static void register(AudioEngine.Provider provider) {
+		ports = provider;
+		if (ports.getClass().getSimpleName().contains(JACK_HELPER))
+			engine = Engine.JACK;
+		else
+			engine = Engine.JAVAX;
+		RTLogger.debug(AudioEngine.class, "Using " + engine + " audio engine");
+	}
+	@Getter private static AudioEngine.Provider ports;
 
 	/** Port wrapper for engine-specific Port object */
 	public record Wrapper(String name, Object port) { }

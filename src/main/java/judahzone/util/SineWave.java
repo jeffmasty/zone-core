@@ -2,6 +2,35 @@ package judahzone.util;
 
 public class SineWave {
 
+	private static final int SIZE = 1024;           // 1024 -> ~4KB table, good quality
+    private static final int MASK = SIZE - 1;
+    private static final float[] TABLE = new float[SIZE];
+
+    static {
+        for (int i = 0; i < SIZE; i++)
+            TABLE[i] = (float) Math.sin(2.0 * Math.PI * i / SIZE);
+    }
+
+    public SineWave() { }
+
+    /** phase in [0,1). Returns sin(2*pi*phase). Audio-thread safe, allocation-free. */
+    public float forPhase(float phase) {
+        // phase -= (int) phase;         // wrap phase into [0,1)
+        float idx = phase * SIZE;
+        int i = ((int) idx) & MASK;
+        float frac = idx - (int) idx;
+        int j = (i + 1) & MASK;
+        // linear interpolation
+        return TABLE[i] * (1.0f - frac) + TABLE[j] * frac;
+    }
+
+    /** Lower-cost nearest-sample lookup (faster, lower quality). */
+    public float sinFromPhaseNearest(float phase) {
+        phase -= (int) phase;
+        int i = ((int)(phase * SIZE)) & MASK;
+        return TABLE[i];
+    }
+
 	private static final double defaultFrequency = 440.;
 	private static final double defaultAmplitude = 0.75;
 	private static final double defaultSR = Constants.sampleRate();

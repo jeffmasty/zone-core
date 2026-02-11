@@ -34,8 +34,8 @@ public class Constants {
 
     public static final int LEFT = 0;
 	public static final int RIGHT = 1;
-	public static final int STEREO = 2;
 	public static final int MONO = 1;
+	public static final int STEREO = 2;
 
 	public static final String NL = System.lineSeparator();
 	public static final String CUTE_NOTE = "♫ ";
@@ -51,7 +51,7 @@ public class Constants {
     /**@param data2 0 to 127
      * @return data2 / 127 */
 	public static float midiToFloat(int data2) {
-		return data2 * 0.00787f;
+		return data2 * TO_1;
 	}
 
     public static float computeTempo(long millis, int beats) {
@@ -116,17 +116,52 @@ public class Constants {
 	}
 
 	public static int reverseLog(float var, float min, float max) {
-	    if (var > max)
-	    	var = max;
-	    if (var < min)
-	    	var = min;
+	    // branchless clamp: var = clamp(var, min, max)
+	    var = Math.max(min, Math.min(max, var));
+	    // ensure min is strictly positive for log computations
+	    min = Math.max(min, 0.0001f);
 
-	    if (min <= 0) min = 0.0001f;
 	    double minv = Math.log(min);
 	    double maxv = Math.log(max);
 	    double scale = (maxv - minv) / (maxp - minp);
 
 	    return (int)Math.round(minp + (Math.log(var) - minv) / scale);
 	}
+
+	/** Inverse-logarithmic mapping from knob percent (0..100) to float (0..1).
+	 * concentrate resolution near 1.
+	 * @param percent knob value 0..100
+	 * @return mapped float value 0..1 */
+	public static float inverseLog(int percent) {
+        // Inverse-logarithmic mapping: concentrate resolution near high knob values.
+        // Avoid passing 0 to Constants.logarithmic (expects 1..100).
+        return 1.0f - Constants.logarithmic(Math.max(1, 100 - percent));
+
+	}
+
+	public static int reverseInverseLog(float var) {
+	    // Inverse of inverse-logarithmic mapping.
+	    // Clamp input to [0..1].
+	    var = Math.max(0f, Math.min(1f, var));
+	    if (var >= 1.0f - 1e-6f)
+	        return 100;
+	    int flipped = Constants.reverseLog(1.0f - var);
+	    int knob = 100 - flipped;
+	    if (knob < 0) knob = 0;
+	    if (knob > 100) knob = 100;
+	    return knob;
+	}
+
+	/**Linear interpolation mapping from source range to target range.
+	 * @param value input value
+	 * @param srcMin source range minimum
+	 * @param srcMax source range maximum
+	 * @param dstMin target range minimum
+	 * @param dstMax target range maximum
+	 * @return mapped value in target range */
+	public static float interpolate(float value, float srcMin, float srcMax, float dstMin, float dstMax) {
+	  return dstMin + (value - srcMin) * (dstMax - dstMin) / (srcMax - srcMin);
+	}
+
 
 }

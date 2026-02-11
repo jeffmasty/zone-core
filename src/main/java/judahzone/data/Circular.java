@@ -1,4 +1,4 @@
-package judahzone.util;
+package judahzone.data;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,7 +49,7 @@ public final class Circular<T> {
     // get oldest, increment read head
     public T get() {
     	T result = get(0);
-    	head = head + 1 % buf.length;
+    	head = (head + 1) % buf.length;
     	return result;
     }
 

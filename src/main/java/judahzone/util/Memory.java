@@ -7,6 +7,8 @@ import java. util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JOptionPane;
 
+import judahzone.data.Recording;
+
 public class Memory {
 
     public static final Memory STEREO = new Memory(WavConstants.STEREO, Constants.bufSize());

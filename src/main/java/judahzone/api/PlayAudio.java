@@ -1,6 +1,8 @@
 // PlayAudio.java
 package judahzone.api;
 
+import judahzone.data.Asset;
+
 /**Participates in real time audio processing, can respond to some commands*/
 public interface PlayAudio {
 
