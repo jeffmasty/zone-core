@@ -24,7 +24,7 @@ public interface PlayAudio {
 
 	void rewind();
 
-	void setEnv(float env);
+	void setAmp(float env);
 
 	void setType(Type type);
 

@@ -13,6 +13,7 @@ public class Memory {
 
     public static final Memory STEREO = new Memory(WavConstants.STEREO, Constants.bufSize());
     public static final Memory MONO = new Memory(WavConstants.MONO, Constants.bufSize());
+    public static final float[] ZERO = new float[Constants.bufSize()];
 
     static final int PRELOAD = 4096;
     static final int THRESHOLD = (int)(PRELOAD * 0.9f);

@@ -32,9 +32,11 @@ public class AudioTools  {
             a.put(0f);
 	}
 
-	// add to judahzone.util.AudioTools
 	public static void silence(float[] buf) {
-	    Arrays.fill(buf, 0f);
+	    if (buf.length == WavConstants.JACK_BUFFER)
+	        System.arraycopy(Memory.ZERO, 0, buf, 0, buf.length);
+	    else
+	        Arrays.fill(buf, 0f);
 	}
 
 	public static void silence(float[][] stereo) {

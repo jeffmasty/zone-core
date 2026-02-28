@@ -1,17 +1,15 @@
 package judahzone.api;
 
-import judahzone.data.Frequency;
-
 public record Note(Key key, int octave, float diff) {
 
 	public Note(Key key, int octave) {
 		this(key, octave, 0);
 	}
 
-	public Note(float hz) {
-		this(Key.key(Frequency.hzToMidi(hz)), Frequency.hzToMidi(hz) / 12,
-				hz - Key.toFrequency(Key.key(Frequency.hzToMidi(hz)), Frequency.hzToMidi(hz) / 12));
-	}
+//	public Note(float hz) {
+//		this(Key.key(Frequency.hzToMidi(hz)), Frequency.hzToMidi(hz) / 12,
+//				hz - Frequency.toFrequency(Key.key(Frequency.hzToMidi(hz)), Frequency.hzToMidi(hz) / 12));
+//	}
 
 
 	@Override public String toString() {

@@ -15,6 +15,12 @@ public class Constants {
 	public static int amplitudeSize() { return WavConstants.AMPLITUDES; }
 	public static float fps() { return WavConstants.FPS; }
 
+	public static final float TWOPI = (float) (2.0 * Math.PI);
+	public static final float I2PI = 1f / TWOPI;
+	public static final float I2PI_SR = I2PI * sampleRate();
+	public static final float IBUF = 1f / bufSize();
+	public static final float ISR = 1f / sampleRate();
+
 	/** Digital Interface name */
 	@Getter static String di = "Komplete ";// "UMC1820 MIDI 1";
 	public static final String LEFT_OUT = "system:playback_1";
@@ -36,6 +42,7 @@ public class Constants {
 	public static final int RIGHT = 1;
 	public static final int MONO = 1;
 	public static final int STEREO = 2;
+	public static final int NORMAL = 100; // default max slider/knob value, one day this will be 127.
 
 	public static final String NL = System.lineSeparator();
 	public static final String CUTE_NOTE = "♫ ";
@@ -69,17 +76,43 @@ public class Constants {
 	public static float toBPM(long delta, int beats) {
 		return 60000 / (delta / (float)beats);
 	}
+///////////////////////////
+//	public static Object ratio(int data2, List<?> input) {
+//        return input.get((int) ((data2 - 1) / (100 / (float)input.size())));
+//	}
+//	public static Object ratio(int data2, Object[] input) {
+//		return input[(int) ((data2 - 1) / 0.01f * input.length)];
+//	}
+//	public static int ratio(long data2, long size) {
+//		return (int) (data2 / 0.01f *  size);
+//	}
+////////////////////////////////////////
+	/** Map a knob percent (0..100) to an index in [0 .. size-1] safely. */
+	public static int ratio(long percent, long size) {
+	    if (size <= 0) return 0;
+	    // clamp percent to 0..100
+	    int p = (int) Math.max(0, Math.min(100, percent));
+	    // Map 0 -> 0 and 100 -> size-1, with even distribution in between.
+	    int idx = Math.round(p * (size - 1) / 100f);
+	    if (idx < 0) idx = 0;
+	    if (idx >= size) idx = (int) (size - 1);
+	    return idx;
+	}
 
-	public static Object ratio(int data2, List<?> input) {
-        return input.get((int) ((data2 - 1) / (100 / (float)input.size())));
-	}
-	public static Object ratio(int data2, Object[] input) {
-		return input[(int) ((data2 - 1) / (100 / (float)input.length))];
-	}
-	public static int ratio(long data2, long size) {
-		return (int) (data2 / (100 / (float)size));
+	/** Return entry from list mapped by knob percent 0..100. */
+	public static <T> T ratio(int percent, List<T> input) {
+	    if (input == null || input.isEmpty()) throw new IllegalArgumentException("input list empty");
+	    int idx = ratio(percent, input.size());
+	    return input.get(idx);
 	}
 
+	/** Return entry from array mapped by knob percent 0..100. */
+	public static <T> T ratio(int percent, T[] input) {
+	    if (input == null || input.length == 0) throw new IllegalArgumentException("input array empty");
+	    int idx = ratio(percent, input.length);
+	    return input[idx];
+	}
+///////////////////////////
 	public static int rotary(int input, int size, boolean up) {
 		 input += (up ? 1 : -1);
 		 if (input >= size)
@@ -99,8 +132,6 @@ public class Constants {
 
 	public static float logarithmic(int percent, float min, float max) {
 
-		// percent will be between 0 and 100
-		assert percent <= max && percent >= min;
 
 		// The result should be between min and max
 		if (min <= 0) min = 0.0001f;
@@ -162,6 +193,52 @@ public class Constants {
 	public static float interpolate(float value, float srcMin, float srcMax, float dstMin, float dstMax) {
 	  return dstMin + (value - srcMin) * (dstMax - dstMin) / (srcMax - srcMin);
 	}
+
+	public static boolean isPow2(int x) {
+	    return (x & (x - 1)) == 0;
+	}
+
+	public static int nextPow2(int v) {
+	    if (v <= 1) return 1;
+	    v--;
+	    v |= v >> 1;
+	    v |= v >> 2;
+	    v |= v >> 4;
+	    v |= v >> 8;
+	    v |= v >> 16;
+	    v++;
+	    return v;
+	}
+
+
+
+
+	public static int toKnob(float value, float min, float max) {
+		float normalized = Math.max(0f, Math.min(1f, (value - min) / (max - min)));
+		return Math.round(normalized * 100f);
+	}
+//
+	public static float fromKnob(int knob, float min, float max) {
+		float normalized = Math.max(0f, Math.min(1f, knob * 0.01f));
+		return min + normalized * (max - min);
+	}
+//
+//
+//	/** Logarithmic mapping helpers for the feedback knob to give more perceptual
+//	    resolution near the high FB end. Uses v = min * (max/min)\^p where p in [0..1]. */
+//	public static float fromKnobLog(int knob, float min, float max) {
+//		float normalized = Math.max(0f, Math.min(1f, knob * 0.01f));
+//		if (min <= 0f)
+//			return decodeFromKnob(knob, min, max);
+//		double ratio = max / min;
+//		return (float)(min * Math.pow(ratio, normalized));
+//	}
+//
+//	/** return value (ranged logarithmically between min and max) in the range 0...100 */
+//	public static int toKnobLog(float value, float min, float max) {
+//		reverseLog(
+//		return (int)Math.round(p * 100d);
+//	}
 
 
 }

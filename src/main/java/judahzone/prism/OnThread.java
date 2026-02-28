@@ -2,19 +2,18 @@ package judahzone.prism;
 
 import java.util.function.Supplier;
 
-/** Minimal lock-free ring queue. Single RT Producer -> Single non-RT Consumer. Pre-fill factory, Power-of-two based. */
+/** Minimal lock-free ring queue. Single UI Producer -> Single RT Consumer.
+    Pre-fill factory, Power-of-two based. */
 @Prism
-public final class OffThread<T> {
+public final class OnThread<T> {
     private final Object[] buf;
     private final int mask;
     private volatile int head = 0; // consumer index (read)
     private volatile int tail = 0; // producer index (write)
 
-    public OffThread(int capacity) {
-        this(capacity, null);
-    }
+    public OnThread(int capacity) { this(capacity, null); }
 
-    public OffThread(int capacity, Supplier<T> prefill) {
+    public OnThread(int capacity, Supplier<T> prefill) {
         if (capacity <= 0) throw new IllegalArgumentException("capacity>0");
         int cap = 1;
         while (cap < capacity) cap <<= 1; // round up to power-of-two
@@ -29,8 +28,8 @@ public final class OffThread<T> {
         }
     }
 
-    /** Non-blocking offer. Returns false if full. Called from the RT producer. */
-    @PrismRT
+    /** Non-blocking offer. Returns false if full. Called from the UI producer. */
+    @PrismUI
     public boolean offer(T e) {
         final int t = tail;
         final int next = (t + 1) & mask;
@@ -41,25 +40,22 @@ public final class OffThread<T> {
         return true;
     }
 
-    /** Capacity (power-of-two actual). Consumer-side in this design. */
-    @PrismUI
-    public int capacity() { return buf.length; }
-
-    /** Non-blocking poll. Returns null if empty. Consumer/GUI-side. */
+    /** Non-blocking poll. Returns null if empty. Called from the RT consumer. */
     @SuppressWarnings("unchecked")
-    @PrismUI
+    @PrismRT
     public T poll() {
         final int h = head;
         if (h == tail) return null; // empty
         final T e = (T) buf[h];
-        buf[h] = null; // help GC / reuse
+        // clear slot to avoid holding references (helps GC)
+        buf[h] = null;
         head = (h + 1) & mask;
         return e;
     }
 
-    /** Peek newest (not advancing). Returns null if empty. Consumer-side. */
+    /** Peek newest (not advancing). Returns null if empty. RT-side safe. */
     @SuppressWarnings("unchecked")
-    @PrismUI
+    @PrismRT
     public T peekNewest() {
         int t = tail;
         if (t == head) return null;
@@ -67,7 +63,11 @@ public final class OffThread<T> {
         return (T) buf[idx];
     }
 
-    /** Approximate size (non-atomic snapshot). Consumer-side. */
+    /** Capacity (power-of-two actual). UI-side. */
+    @PrismUI
+    public int capacity() { return buf.length; }
+
+    /** Approximate size (non-atomic snapshot). UI-side. */
     @PrismUI
     public int size() {
         int t = tail;

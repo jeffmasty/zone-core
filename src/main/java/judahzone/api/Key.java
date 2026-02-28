@@ -105,42 +105,6 @@ public enum Key {
 		return count;
 	}
 
-	private static final int A4_POSITION = 9 + 4 * 12; // A4 is the 9th note in the 4th octave (0-indexed)
-
-	public static float toFrequency(Note n) {
-		return toFrequency(n.key(), n.octave());
-	}
-
-	public static float toFrequency(Key note, int octave) {
-        int position = note.ordinal() + (octave + 1) * 12; // equal-tempered scale
-        int semitones = position - A4_POSITION;
-        return (float) (TUNING * Math.pow(2, semitones / 12.0));
-    }
-
-	/** @return the nearest Note for hz */
-	public static Note toNote(float hz) {
-	   Key nearestKey = null;
-	    int nearestOctave = 0;
-	    float minDifference = Float.MAX_VALUE; // absolute
-	    float difference = Float.MAX_VALUE; // actual
-	    // Iterate through all keys and octaves to find the closest match
-	    for (int octave = 0; octave <= 8; octave++) { // Assuming the range of octaves is 0 to 8
-	        for (Key key : Key.values()) {
-	            float frequency = Key.toFrequency(key, octave);
-
-	            float abs = Math.abs(frequency - hz);
-
-	            if (abs < minDifference) {
-	                minDifference = abs;
-	                difference = frequency - hz;
-	                nearestKey = key;
-	                nearestOctave = octave;
-	            }
-	        }
-	    }
-	    return new Note(nearestKey, nearestOctave, -1 * difference);
-	}
-
 }
 
 
