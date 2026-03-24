@@ -28,7 +28,6 @@ public interface MidiClock extends Closeable {
 
 	void cont(); // continue
 
-	// new Method:
 	void pulse();  // heartbeat
 
 }

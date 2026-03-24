@@ -7,6 +7,8 @@ import java.util.List;
 
 import javax.sound.midi.ShortMessage;
 
+import judahzone.data.Key;
+
 public class Chord extends ArrayList<Key> {
 
 	// major, minor, maj7, dom7, aug, dim, root/isInversion, add9  TODO 11,13 b13

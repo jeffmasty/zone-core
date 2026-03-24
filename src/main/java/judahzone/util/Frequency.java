@@ -1,14 +1,14 @@
-package judahzone.api;
+package judahzone.util;
 
 import java.awt.Point;
+
+import judahzone.data.Key;
+import judahzone.data.Note;
 
 /**Small utility helpers for MIDI <-> Hz conversions using the common •
  * reference A4 = MIDI 69 = 440.0 Hz. * • All primary conversion methods return
  * floats (single precision). • Equal-tempered 12-tone temperament is assumed.
- * LUT: Precompute MIDI->Hz for MIDI 0..127 and clamp to [MIN, MAX] range.
- * */
-
-
+ * LUT: Precompute MIDI->Hz for MIDI 0..127 and clamp to [MIN, MAX] range. */
 public final class Frequency {
 
 	public static final float MIN = 27.5f; // lowest note A0
@@ -101,6 +101,14 @@ public final class Frequency {
         int semitones = position - REFERENCE_MIDI; // semitones from A4
         return (float) (REFERENCE_FREQUENCY * Math.pow(2, semitones / 12.0));
     }
+
+
+	/** @return difference between detected and reference frequencies in cents */
+	public static float hzToCents(float detected, float reference) {
+	    if (detected <= 0f || reference <= 0f) return Float.NaN;
+	    double cents = 1200.0 * Math.log(detected / reference) * INV_LOG2;
+	    return (float) cents;
+	}
 
 	/** @return the nearest Note for hz */
 	public static Note toNote(float hz) {

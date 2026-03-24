@@ -109,4 +109,16 @@ public class Threads {
         }
     }
 
+	// reserve N cores (default 1) for OS/other processes and ensure at least 1 worker.
+	private static final int RESERVED_CORES = Math.max(0, Integer.getInteger("judah.reserved.cores", 1));
+	private static final int LOGICAL_CORES = Runtime.getRuntime().availableProcessors();
+	private static final int DSP_WORKERS = Math.max(1, LOGICAL_CORES - RESERVED_CORES);
+	// Make configurable with -Djudah.reserved.cores=<n>
+	public static ExecutorService getProcessPool() {
+		return 	Executors.newFixedThreadPool(
+			    DSP_WORKERS, r -> { Thread t = new Thread(r, "DSP-Worker");
+				t.setDaemon(true);
+				return t; });
+	}
+
  }

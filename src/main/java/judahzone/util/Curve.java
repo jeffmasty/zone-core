@@ -1,4 +1,4 @@
-package judahzone.api;
+package judahzone.util;
 
 /** Decay curve */
 public interface Curve {

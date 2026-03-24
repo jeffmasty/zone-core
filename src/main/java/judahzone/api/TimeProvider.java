@@ -1,5 +1,7 @@
 package judahzone.api;
 
+import judahzone.data.Signature;
+
 public interface TimeProvider {
 
 	void addListener(TimeListener l);

@@ -3,6 +3,7 @@ package judahzone.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import judahzone.data.Recording;
 
@@ -21,7 +22,7 @@ import judahzone.data.Recording;
 // Fast - no checks by default
 public class FromDisk implements WavConstants {
 
-	private FileInputStream iStream;	// Input stream used for reading data
+	private InputStream iStream;	// Input stream used for reading data
 	private final byte[] buffer = new byte[DISK_BUFFER]; // local buffer for disk IO
 	private int numFrames;				// Number of frames within the data section
 	int numChannels = 2;				// 2 bytes unsigned, 0x0001 (1) to 0xFFFF (65,535)
@@ -32,8 +33,13 @@ public class FromDisk implements WavConstants {
 
 	/**@return size of file in frames */
 	public int load(File file, float factor, Recording into) throws IOException {
-		iStream = new FileInputStream(file);
+		return load(new FileInputStream(file), factor, into);
+	}
 
+
+
+	public int load(InputStream stream, float factor, Recording into) throws IOException {
+		iStream = stream;
 		// Read the first 12 bytes of the file
 		int bytesRead = iStream.read(buffer, 0, 12);
 		if (bytesRead != 12) throw new IOException("Not enough wav file bytes for header");
@@ -48,9 +54,9 @@ public class FromDisk implements WavConstants {
 		if (riffTypeID != RIFF_TYPE_ID) throw new IOException("Invalid Wav Header data, incorrect riff type ID");
 
 		// Check that the file size matches the number of bytes listed in header
-		if (file.length() != chunkSize + 8)
-			RTLogger.debug(this, "File size ( " + file.length()+ ") does not match Header chunk size " + (chunkSize + 8)
-					+ " diff: " + (file.length() - (chunkSize+8)));
+//		if (file.length() != chunkSize + 8)
+//			RTLogger.debug(this, "File size ( " + file.length()+ ") does not match Header chunk size " + (chunkSize + 8)
+//					+ " diff: " + (file.length() - (chunkSize+8)));
 
 		boolean foundFormat = false;
 		boolean foundData = false;
@@ -74,7 +80,7 @@ public class FromDisk implements WavConstants {
 				foundFormat = true;
 
 				// Read in the header info
-				bytesRead = readFormat(file);
+				bytesRead = readFormat();
 				// Account for number of format bytes and skip over any extra format bytes
 				numChunkBytes -= 16;
 				if (numChunkBytes > 0) iStream.skip(numChunkBytes);
@@ -168,7 +174,7 @@ public class FromDisk implements WavConstants {
 		return val;
 	}
 
-	private int readFormat(File file) throws IOException {
+	private int readFormat() throws IOException {
 		int result = iStream.read(buffer, 0, 16);
 
 		// Check this is uncompressed data
@@ -179,12 +185,12 @@ public class FromDisk implements WavConstants {
 		numChannels = getLE(buffer, 2, 2);
 		long srate = getLE(buffer, 4, 4);
 		if (srate != S_RATE)
-			throw new IOException("Sample rate(" + S_RATE + ") vs: " + srate + " " + file.getAbsolutePath());
+			throw new IOException("Sample rate(" + S_RATE + ") vs: " + srate);
 		blockAlign = getLE(buffer, 12, 2);
 
 		int bits = getLE(buffer, 14, 2);
 		if (bits != VALID_BITS)
-			throw new IOException("Bit Depth: " + bits + " (expected: " + VALID_BITS + ") " + file.getAbsolutePath());
+			throw new IOException("Bit Depth: " + bits + " (expected: " + VALID_BITS + ")");
 		if (numChannels == 0) throw new IOException("Number of channels specified in header is equal to zero");
 		if (blockAlign == 0) throw new IOException("Block Align specified in header is equal to zero");
 		if (SAMPLE_BYTES * numChannels != blockAlign)

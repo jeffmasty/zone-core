@@ -1,8 +1,8 @@
 package judahzone.prism;
 
-import judahzone.api.Curve;
 import judahzone.data.Letter;
 import judahzone.prism.Envelope.Delta;
+import judahzone.util.Curve;
 import judahzone.util.Ramp;
 
 /** Segment: reusable envelope segment with robust monotonic progress tracking.
@@ -25,22 +25,28 @@ public class Segment {
 	private final Ramp startRamp;
 	private final Ramp endRamp;
 
+	/** New constructor: accept rampSamples directly (sample-count smoothing). */
+	public Segment(Delta stage, int length, int rampSamples, Curve curve, float startLevel, float endLevel) {
+		this.stage = stage;
+		this.curve = (curve == null) ? Curve.EXPONENTIAL : curve;
+		this.startLevel = Math.max(0f, Math.min(1f, startLevel));
+		this.endLevel = Math.max(0f, Math.min(1f, endLevel));
+
+		// ensure at least 1 sample for smoothing
+		int rs = Math.max(1, rampSamples);
+		this.startRamp = new Ramp(rs);
+		this.endRamp = new Ramp(rs);
+
+		// initialize ramps to match initial logical levels (no jump)
+		this.startRamp.reset(this.startLevel);
+		this.endRamp.reset(this.endLevel);
+
+		setLength(length);
+	}
+
+	/** Backwards-compatible constructor accepting smoothMS (milliseconds) and converting using the default sample rate. */
 	public Segment(Delta stage, int length, long smoothMS, Curve curve, float startLevel, float endLevel) {
-	    this.stage = stage;
-	    this.curve = (curve == null) ? Curve.EXPONENTIAL : curve;
-	    this.startLevel = Math.max(0f, Math.min(1f, startLevel));
-	    this.endLevel = Math.max(0f, Math.min(1f, endLevel));
-
-	    // compute ramp length in samples from smoothMS (ensure at least 1 sample)
-	    int rampSamples = Math.max(1, Letter.msToSamples(Math.max(0L, smoothMS)));
-	    this.startRamp = new Ramp(rampSamples);
-	    this.endRamp = new Ramp(rampSamples);
-
-	    // initialize ramps to match initial logical levels (no jump)
-	    this.startRamp.reset(this.startLevel);
-	    this.endRamp.reset(this.endLevel);
-
-	    setLength(length);
+		this(stage, length, Math.max(1, Letter.msToSamples(Math.max(0L, smoothMS))), curve, startLevel, endLevel);
 	}
 
 	public void reset() {
@@ -53,7 +59,7 @@ public class Segment {
 
 	public void setStartLevel(float level) {
 	    this.startLevel = Math.max(0f, Math.min(1f, level));
-	    this.startRamp.set(this.startLevel);
+	    this.startRamp.setTarget(this.startLevel);
 	}
 
 	public Segment(Delta stage, int length, Curve curve) {
@@ -65,7 +71,13 @@ public class Segment {
 
 	public void setEndLevel(float level) {
 	    this.endLevel = Math.max(0f, Math.min(1f, level));
-	    this.endRamp.set(this.endLevel);
+	    this.endRamp.setTarget(this.endLevel);
+	}
+
+	/** Live update of end level (sustain) without resetting ramps or pos. */
+	public void updateEndLevel(float level) {
+		this.endLevel = Math.max(0f, Math.min(1f, level));
+		this.endRamp.setTarget(this.endLevel);
 	}
 
 	public void setLength(int length) {
@@ -82,6 +94,21 @@ public class Segment {
 	    // when length changes, keep ramps aligned to logical levels to avoid transient pops
 	    startRamp.reset(startLevel);
 	    endRamp.reset(endLevel);
+	}
+
+	/** Live update of length without resetting pos or ramps. 
+	 * If current position is beyond new length, segment completes immediately. */
+	public void updateLength(int length) {
+		int l = Math.max(0, length);
+		this.totalSamples = l;
+		if (l <= 0) {
+			this.complete = true;
+		} else if (pos >= l && l != Integer.MAX_VALUE) {
+			this.complete = true;
+			this.pos = l;
+		} else if (l == Integer.MAX_VALUE) {
+			this.complete = false;
+		}
 	}
 
 	public void setInfinite() {
@@ -119,6 +146,11 @@ public class Segment {
 
 	public boolean isComplete() {
 	    return complete && totalSamples != Integer.MAX_VALUE;
+	}
+
+	/** Check if this segment is being activated for the first time (pos == 0). */
+	public boolean isActivating() {
+		return pos == 0 && !complete;
 	}
 
 	}

@@ -10,4 +10,6 @@ public interface IRProvider {
 
 	IR get(int i);
 
+	String[] getNames();
+
 }

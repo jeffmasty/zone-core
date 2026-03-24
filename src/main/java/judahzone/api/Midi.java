@@ -5,8 +5,13 @@ import javax.sound.midi.MidiEvent;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.ShortMessage;
 
+import judahzone.data.Key;
+
 /** Utilities added to javax ShortMessage*/
 public class Midi extends ShortMessage {
+
+	public static final int DRUM_CH = 9;
+	public static final int CUTOFF = 63; // toggle binary CCs
 
 	public static final String PARAM_COMMAND = "command";
 	public static final String PARAM_CHANNEL = "channel";

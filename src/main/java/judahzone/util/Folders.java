@@ -7,7 +7,7 @@ import java.util.HashMap;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
-import judahzone.api.Signature;
+import judahzone.data.Signature;
 import lombok.Getter;
 
 public class Folders { // TODO Folder/Settings Service not hardcoded
@@ -25,12 +25,12 @@ public class Folders { // TODO Folder/Settings Service not hardcoded
 	@Getter static final File Midi = new File(LIVE, "midi");
 	@Getter static final File PresetsFile = new File(LIVE, "presets.zone");
 	@Getter static final File Samples = new File(LIVE, "samples");
-	@Getter static final File Synths = new File(LIVE, "synths");
+	@Getter static final File Notes = new File(LIVE, "notes");
+
 	@Getter static final File SheetMusic = new File(LIVE, "sheets");
 	@Getter static final File SynthPresets = new File(LIVE, "taco.sauce");
 	@Getter static final File UserChannels = new File(LIVE, "channel.zone");
-	@Getter static final File DrumSynth = new File(LIVE, "drumsynth.zone");
-	@Getter static final File Oldschool = new File(LIVE, "oldschool.zone");
+	@Getter static final File drumsets = new File(LIVE, "drumsets.zone");
 	// @Getter static final File Bass = new File(LIVE, "bass"); // monosynth
 
 	@Getter static final File ImportDrums = new File(HOME, "/tracks/beatbuddy/");

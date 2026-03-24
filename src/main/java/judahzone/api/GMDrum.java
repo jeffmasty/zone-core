@@ -54,6 +54,7 @@ public enum GMDrum {
     OpenTriangle(81, "Open Triangle"),
     Shaker(82, "Shaker");
 
+
 	public static final GMDrum[] Standard = new GMDrum[] {
             BassDrum, SideStick, AcousticSnare, HandClap,
             ClosedHiHat, PedalHiHat, OpenHiHat, RideCymbal,
@@ -94,7 +95,21 @@ public enum GMDrum {
 	public String toString() {
 	    return display;
 	}
-
-
 }
+
+/*
+Program Drum Kit	 Notes
+1	Standard Drum Kit
+9	Room Drum Kit    diff. reverbs
+17	Power Drum Kit
+25	Electric Drum Kit
+26	Rap TR808 Drums
+33	Jazz Drum Kit
+41	Brush Kit        below
+
+Note #38 is a Brush Tap instead of a Snare Drum
+Note #39 is a Brush Slap instead of a Hand Clap.
+Note #40 is a Brush Swirl instead of an Electric Snare Drum.
+
+*/
 
